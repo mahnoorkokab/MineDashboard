@@ -9,7 +9,6 @@ from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Depends, st
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.staticfiles import StaticFiles
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, date
 from pydantic import BaseModel, Field, field_validator

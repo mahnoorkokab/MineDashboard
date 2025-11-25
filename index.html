@@ -1118,7 +1118,8 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8000/api/v1';
+        // Auto-detect API URL based on current origin (works for both localhost and deployed)
+        const API_URL = window.location.origin + '/api/v1';
         let charts = {};
         let currentFilters = { bu: 'all', status: 'all', contractor: 'all' };
         let allProgressData = [];
