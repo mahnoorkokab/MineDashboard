@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildPro - Construction Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff6b35;
+            --secondary-color: #f7931e;
+            --accent-color: #ffd23f;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-bg: #1a1d29;
+            --card-bg: #242936;
+            --sidebar-bg: #1e2230;
+            --text-primary: #ffffff;
+            --text-secondary: #8b92b0;
+            --border-color: #2d3142;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            padding: 30px 0;
+            z-index: 1000;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-section p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 8px 20px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .nav-link i {
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title h2 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        select,
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        select {
+            min-width: 180px;
+            appearance: none;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        select:hover {
+            background-color: rgba(255, 107, 53, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            border: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .kpi-title {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .kpi-icon.orange {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-color);
+        }
+
+        .kpi-icon.green {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .kpi-icon.blue {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+
+        .kpi-icon.yellow {
+            background: rgba(255, 210, 63, 0.1);
+            color: var(--accent-color);
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .kpi-subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .kpi-trend.up {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .kpi-trend.down {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .chart-title h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-title p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .view-details-btn {
+            padding: 8px 16px;
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-details-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Bullet Chart Styles */
+        .bullet-chart-container {
+            padding: 20px 0;
+        }
+
+        .bullet-item {
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .bullet-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .bullet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bullet-project-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bullet-value {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        .bullet-track {
+            width: 100%;
+            height: 35px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bullet-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            transition: width 0.8s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
+
+        .bullet-bar-text {
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .bullet-target {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: #28a745;
+            z-index: 10;
+        }
+
+        .bullet-target::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -3px;
+            width: 9px;
+            height: 9px;
+            background: #28a745;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .bullet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .bullet-contractor {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .bullet-contractor i {
+            color: var(--primary-color);
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tr:hover {
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.ongoing {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+
+        .status-badge.completed {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-badge.onng {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 2% auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+
+        .location-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .location-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            border: 2px solid var(--primary-color);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .location-info h3 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .location-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .location-details {
+            margin-top: 20px;
+        }
+
+        .location-detail-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .location-detail-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .location-detail-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .location-detail-value {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .location-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .location-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
+
+        .location-contractors {
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1400px) {
+            .location-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .location-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-section">
+            <h1><i class="fas fa-hard-hat"></i> BuildPro</h1>
+            <p>Construction Project Management</p>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <div class="nav-link active" data-section="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></div>
+            </li>
+            <li class="nav-item">
+                <div class="nav-link" data-section="cost"><i class="fas fa-dollar-sign"></i><span>Cost Analysis</span></div>
+            </li>
+            <li class="nav-item">
+                <div class="nav-link" data-section="timeline"><i class="fas fa-calendar-alt"></i><span>Timeline</span></div>
+            </li>
+            <li class="nav-item">
+                <div class="nav-link" data-section="locations"><i class="fas fa-map-marker-alt"></i><span>Locations</span></div>
+            </li>
+            <li class="nav-item">
+                <div class="nav-link" data-section="staff"><i class="fas fa-user-tie"></i><span>Staff</span></div>
+            </li>
+            <li class="nav-item">
+                <div class="nav-link" data-section="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="page-title">
+                <h2 id="page-title">Project Dashboard</h2>
+                <p id="page-subtitle">Real-time construction project analytics</p>
+            </div>
+            <div class="top-actions">
+                <div class="filter-group">
+                    <select id="filter-bu" onchange="applyFilters()">
+                        <option value="all">All Business Units</option>
+                    </select>
+                    <select id="filter-status" onchange="applyFilters()">
+                        <option value="all">All Status</option>
+                    </select>
+                    <select id="filter-contractor" onchange="applyFilters()">
+                        <option value="all">All Contractors</option>
+                    </select>
+                </div>
+                <button class="action-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="section active">
+            <div class="kpi-grid" id="kpi-grid">
+                <div class="loading"><i class="fas fa-spinner"></i>
+                    <p>Loading...</p>
+                </div>
+            </div>
+            <div class="chart-grid">
+                <!-- BULLET CHART for Project Progress -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-chart-bar"></i></div>
+                            <div>
+                                <h3>Project Progress</h3>
+                                <p>Top 5 projects by value</p>
+                            </div>
+                        </div>
+                        <button class="view-details-btn" onclick="viewAllProgress()"><i class="fas fa-expand"></i> View
+                            Details</button>
+                    </div>
+                    <div class="bullet-chart-container" id="bulletChart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-chart-pie"></i></div>
+                            <div>
+                                <h3>Cost by Contractor</h3>
+                                <p>Top 5 contractors</p>
+                            </div>
+                        </div>
+                        <button class="view-details-btn" onclick="viewAllContractors()"><i class="fas fa-expand"></i>
+                            View Details</button>
+                    </div>
+                    <div class="chart-container"><canvas id="contractorChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-building"></i></div>
+                            <div>
+                                <h3>Business Unit Analysis</h3>
+                                <p>Top 5 by investment</p>
+                            </div>
+                        </div>
+                        <button class="view-details-btn" onclick="viewAllBU()"><i class="fas fa-expand"></i> View
+                            Details</button>
+                    </div>
+                    <div class="chart-container"><canvas id="buChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-ruler"></i></div>
+                            <div>
+                                <h3>Unit Analysis</h3>
+                                <p>Top 5 by quantity</p>
+                            </div>
+                        </div>
+                        <button class="view-details-btn" onclick="viewAllUnits()"><i class="fas fa-expand"></i> View
+                            Details</button>
+                    </div>
+                    <div class="chart-container"><canvas id="unitChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Analysis Section -->
+        <div id="section-cost" class="section">
+            <div class="kpi-grid" id="cost-kpis">
+                <div class="loading"><i class="fas fa-spinner"></i></div>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            <div>
+                                <h3>Cost Distribution</h3>
+                                <p>By contractor (Top 10)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="costChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <div class="chart-title-icon"><i class="fas fa-chart-area"></i></div>
+                            <div>
+                                <h3>Value vs Completed</h3>
+                                <p>By BU</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container"><canvas id="valueCompletedChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div id="section-timeline" class="section">
+            <div class="table-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <div class="chart-title-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div>
+                            <h3>Project Timeline</h3>
+                            <p>CDS tracking</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>CDS</th>
+                                <th>Contractor</th>
+                                <th>Estimated Days</th>
+                                <th>Finish Date</th>
+                                <th>Status</th>
+                                <th>Completion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timeline-tbody">
+                            <tr>
+                                <td colspan="7" class="loading"><i class="fas fa-spinner"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Locations Section -->
+        <div id="section-locations" class="section">
+            <div class="location-cards" id="locations-content">
+                <div class="loading"><i class="fas fa-spinner"></i></div>
+            </div>
+        </div>
+
+        <!-- Staff Section -->
+        <div id="section-staff" class="section">
+            <div class="table-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <div class="chart-title-icon"><i class="fas fa-user-tie"></i></div>
+                        <div>
+                            <h3>Staff Workload</h3>
+                            <p>Supervision analysis</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Staff Name</th>
+                                <th>Total Value Supervised (RM)</th>
+                                <th>Projects</th>
+                                <th>Avg Completion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-tbody">
+                            <tr>
+                                <td colspan="4" class="loading"><i class="fas fa-spinner"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="section-settings" class="section">
+            <div class="table-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <div class="chart-title-icon"><i class="fas fa-cog"></i></div>
+                        <div>
+                            <h3>Dashboard Settings</h3>
+                            <p>Configuration</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 20px;">
+                    <h4 style="margin-bottom: 20px; color: var(--primary-color);">Data Management</h4>
+                    <button class="action-btn" onclick="reloadExcelData()"><i class="fas fa-sync-alt"></i> Reload Data
+                        from Excel</button>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 14px;">Click to reload data
+                        from projects_data.xlsx</p>
+                    <h4 style="margin: 30px 0 20px; color: var(--primary-color);">Dashboard Information</h4>
+                    <div style="background: rgba(255, 107, 53, 0.1); padding: 15px; border-radius: 10px;">
+                        <p style="color: var(--text-primary); margin-bottom: 10px;"><strong>Total Projects:</strong>
+                            <span id="settings-total-projects">-</span>
+                        </p>
+                        <p style="color: var(--text-primary); margin-bottom: 10px;"><strong>Business Units:</strong>
+                            <span id="settings-bus">-</span>
+                        </p>
+                        <p style="color: var(--text-primary); margin-bottom: 10px;"><strong>Contractors:</strong> <span
+                                id="settings-contractors">-</span></p>
+                        <p style="color: var(--text-primary);"><strong>Locations:</strong> <span
+                                id="settings-locations">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="detailsModal" class="modal" onclick="if(event.target==this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Details</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api/v1';
+        let charts = {};
+        let currentFilters = { bu: 'all', status: 'all', contractor: 'all' };
+        let allProgressData = [];
+        let allContractorData = {};
+        let allBUData = [];
+        let allUnitData = [];
+
+        Chart.register(ChartDataLabels);
+        Chart.defaults.set('plugins.datalabels', { display: false });
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                const section = this.getAttribute('data-section');
+                showSection(section);
+            });
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const navLink = document.querySelector(`[data-section="${sectionId}"]`);
+            if (navLink) navLink.classList.add('active');
+
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            const section = document.getElementById(`section-${sectionId}`);
+            if (section) section.classList.add('active');
+
+            const titles = {
+                'dashboard': ['Project Dashboard', 'Real-time construction project analytics'],
+                'cost': ['Cost Analysis', 'Financial performance metrics'],
+                'timeline': ['Project Timeline', 'CDS tracking and scheduling'],
+                'locations': ['Location Overview', 'Geographic distribution'],
+                'staff': ['Staff Workload', 'Project supervision analysis'],
+                'settings': ['Dashboard Settings', 'Configuration and data management']
+            };
+
+            if (titles[sectionId]) {
+                document.getElementById('page-title').textContent = titles[sectionId][0];
+                document.getElementById('page-subtitle').textContent = titles[sectionId][1];
+            }
+
+            loadSectionData(sectionId);
+        }
+
+        async function loadSectionData(section) {
+            try {
+                switch (section) {
+                    case 'dashboard': await loadDashboard(); break;
+                    case 'cost': await loadCostAnalysis(); break;
+                    case 'timeline': await loadTimeline(); break;
+                    case 'locations': await loadLocations(); break;
+                    case 'staff': await loadStaff(); break;
+                    case 'settings': await loadSettings(); break;
+                }
+            } catch (error) {
+                console.error(`[ERROR] Loading section ${section}:`, error);
+            }
+        }
+
+        async function loadFilters() {
+            try {
+                console.log('[FILTERS] Loading...');
+                const response = await fetch(`${API_URL}/filters/options`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const filters = await response.json();
+                console.log('[FILTERS] Received:', filters);
+
+                const buSelect = document.getElementById('filter-bu');
+                const statusSelect = document.getElementById('filter-status');
+                const contractorSelect = document.getElementById('filter-contractor');
+
+                buSelect.innerHTML = '<option value="all">All Business Units</option>';
+                if (filters.bus && filters.bus.length > 0) {
+                    filters.bus.forEach(bu => {
+                        if (bu && bu.trim() !== '') {
+                            buSelect.innerHTML += `<option value="${bu}">${bu}</option>`;
+                        }
+                    });
+                }
+
+                statusSelect.innerHTML = '<option value="all">All Status</option>';
+                if (filters.statuses && filters.statuses.length > 0) {
+                    filters.statuses.forEach(s => {
+                        if (s && s.trim() !== '') {
+                            statusSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                        }
+                    });
+                }
+
+                contractorSelect.innerHTML = '<option value="all">All Contractors</option>';
+                if (filters.contractors && filters.contractors.length > 0) {
+                    filters.contractors.forEach(c => {
+                        if (c && c.trim() !== '') {
+                            contractorSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                        }
+                    });
+                }
+
+                console.log('[FILTERS] ✅ Loaded successfully');
+            } catch (error) {
+                console.error('[FILTERS] ❌ Error:', error);
+                alert('Failed to load filters. Check if backend is running at ' + API_URL);
+            }
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                bu: document.getElementById('filter-bu').value,
+                status: document.getElementById('filter-status').value,
+                contractor: document.getElementById('filter-contractor').value
+            };
+            console.log('[FILTERS] Applied:', currentFilters);
+            refreshCurrentSection();
+        }
+
+        function refreshCurrentSection() {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id.replace('section-', '');
+                loadSectionData(sectionId);
+            }
+        }
+
+        async function refreshData() {
+            console.log('[REFRESH] Refreshing data...');
+            await refreshCurrentSection();
+            console.log('[REFRESH] ✅ Data refreshed');
+        }
+
+        async function loadDashboard() {
+            console.log('[DASHBOARD] Loading...');
+            await loadSummary();
+            await loadBulletChart();
+            await loadContractorPieChart();
+            await loadBUChart();
+            await loadUnitChart();
+            console.log('[DASHBOARD] ✅ Loaded');
+        }
+
+        async function loadSummary() {
+            try {
+                console.log('[SUMMARY] Loading...');
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/dashboard/summary?${params}`);
+                if (!response.ok) throw new Error('Failed to load summary');
+                const data = await response.json();
+
+                document.getElementById('kpi-grid').innerHTML = `
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total Projects</span>
+                    <div class="kpi-icon orange"><i class="fas fa-project-diagram"></i></div>
+                </div>
+                <div class="kpi-value">${data.total_projects}</div>
+                <div class="kpi-subtitle">Active construction projects</div>
+                <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> ${data.ongoing_projects} ongoing</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total Value</span>
+                    <div class="kpi-icon green"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="kpi-value">RM ${(data.total_value_rm / 1000000).toFixed(1)}M</div>
+                <div class="kpi-subtitle">Total project investment</div>
+                <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> ${data.total_value_rm > 0 ? ((data.total_completed_value / data.total_value_rm) * 100).toFixed(1) : 0}% completed</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Avg Completion</span>
+                    <div class="kpi-icon blue"><i class="fas fa-percentage"></i></div>
+                </div>
+                <div class="kpi-value">${data.average_completion_percentage.toFixed(1)}%</div>
+                <div class="kpi-subtitle">Overall project progress</div>
+                <div class="kpi-trend ${data.average_completion_percentage > 70 ? 'up' : 'down'}"><i class="fas fa-${data.average_completion_percentage > 70 ? 'arrow-up' : 'arrow-down'}"></i> ${data.average_completion_percentage > 70 ? 'On track' : 'Needs attention'}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Active Contractors</span>
+                    <div class="kpi-icon yellow"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="kpi-value">${data.active_contractors_count}</div>
+                <div class="kpi-subtitle">Working contractors</div>
+                <div class="kpi-trend up"><i class="fas fa-check"></i> All verified</div>
+            </div>
+        `;
+                console.log('[SUMMARY] ✅ Loaded');
+            } catch (error) {
+                console.error('[SUMMARY] ❌ Error:', error);
+                showError('kpi-grid');
+            }
+        }
+
+        // BULLET CHART
+        async function loadBulletChart() {
+            try {
+                console.log('[BULLET] Loading chart...');
+
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/projects/progress?${params}`);
+                if (!response.ok) throw new Error('Failed to load progress');
+                const data = await response.json();
+
+                console.log('[BULLET] Received', data.length, 'projects');
+
+                // Store ALL data for View Details
+                allProgressData = data;
+
+                // Sort by value and take TOP 5 ONLY
+                const sortedData = [...data].sort((a, b) => (b.value_rm || 0) - (a.value_rm || 0));
+                const top5 = sortedData.slice(0, 5);
+
+                console.log('[BULLET] Displaying top 5:', top5.map(p => p.project));
+
+                const container = document.getElementById('bulletChart');
+                if (!container) return;
+
+                let html = '';
+                top5.forEach(project => {
+                    const progress = project.progress_percent || project.percentage || 0;
+                    const target = 100;
+                    const projectName = project.project || 'Unknown Project';
+                    // FIX: Use 'award' field instead of 'contractor'
+                    const contractor = project.award || project.contractor || 'Unknown';
+                    const status = project.status || 'Unknown';
+
+                    html += `
+                <div class="bullet-item">
+                    <div class="bullet-header">
+                        <div class="bullet-project-name" title="${projectName}">${projectName}</div>
+                        <div class="bullet-value">${progress.toFixed(1)}%</div>
+                    </div>
+                    <div class="bullet-track">
+                        <div class="bullet-bar" style="width: ${progress}%">
+                            ${progress > 15 ? `<span class="bullet-bar-text">${progress.toFixed(0)}%</span>` : ''}
+                        </div>
+                        <div class="bullet-target" style="left: ${target}%"></div>
+                    </div>
+                    <div class="bullet-info">
+                        <div class="bullet-contractor">
+                            <i class="fas fa-user"></i>
+                            <span>${contractor}</span>
+                        </div>
+                        <div class="bullet-status">
+                            <span class="status-badge ${(status || '').toLowerCase().replace(/[\s-]/g, '')}">${status}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+                });
+
+                container.innerHTML = html || '<div class="loading">No data available</div>';
+
+                console.log('[BULLET] ✅ Chart created');
+            } catch (error) {
+                console.error('[BULLET] ❌ Error:', error);
+                const container = document.getElementById('bulletChart');
+                if (container) {
+                    container.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Failed to load progress data</div>';
+                }
+            }
+        }
+
+        async function loadContractorPieChart() {
+            try {
+                console.log('[CONTRACTOR] Loading chart...');
+
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/cost/by-contractor?${params}`);
+                if (!response.ok) throw new Error('Failed to load contractor data');
+                const result = await response.json();
+                const data = result.data || result;
+
+                console.log('[CONTRACTOR] Received:', Object.keys(data).length, 'contractors');
+
+                // Store ALL data for View Details
+                allContractorData = data;
+
+                // TOP 5 ONLY
+                const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                const contractors = sorted.map(([k, v]) => k);
+                const values = sorted.map(([k, v]) => v);
+
+                console.log('[CONTRACTOR] Displaying top 5:', contractors);
+
+                const colors = ['#ff6b35', '#f7931e', '#ffd23f', '#ffaa33', '#ff8c42'];
+
+                const ctx = document.getElementById('contractorChart');
+                if (charts.contractorChart) charts.contractorChart.destroy();
+
+                charts.contractorChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: contractors,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors,
+                            borderWidth: 3,
+                            borderColor: '#1a1d29',
+                            hoverBorderWidth: 5,
+                            hoverBorderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#8b92b0', padding: 15, font: { size: 11 } } },
+                            tooltip: { backgroundColor: '#242936', callbacks: { label: (ctx) => ctx.label + ': RM ' + formatNumber(ctx.parsed) } }
+                        },
+                        cutout: '60%'
+                    }
+                });
+
+                console.log('[CONTRACTOR] ✅ Chart created');
+            } catch (error) {
+                console.error('[CONTRACTOR] ❌ Error:', error);
+            }
+        }
+
+        async function loadBUChart() {
+            try {
+                console.log('[BU] Loading chart...');
+
+                const response = await fetch(`${API_URL}/business-units/analysis`);
+                if (!response.ok) throw new Error('Failed to load BU data');
+                const data = await response.json();
+
+                console.log('[BU] Received:', data.length, 'business units');
+
+                // Store ALL data for View Details
+                allBUData = data;
+
+                // Sort and take TOP 5 ONLY
+                const sortedData = [...data].sort((a, b) => (b.total_value || 0) - (a.total_value || 0));
+                const top5 = sortedData.slice(0, 5);
+
+                console.log('[BU] Displaying top 5:', top5.map(d => d.bu));
+
+                const ctx = document.getElementById('buChart');
+                if (charts.buChart) charts.buChart.destroy();
+
+                charts.buChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: top5.map(d => d.bu),
+                        datasets: [{
+                            label: 'Total Value',
+                            data: top5.map(d => d.total_value || 0),
+                            backgroundColor: '#ff6b35',
+                            borderRadius: 8
+                        }, {
+                            label: 'Completed Value',
+                            data: top5.map(d => d.total_completed_value || d.completed_value || 0),
+                            backgroundColor: '#28a745',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#8b92b0' } },
+                            tooltip: { backgroundColor: '#242936' }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#8b92b0' } },
+                            y: { grid: { color: '#2d3142' }, ticks: { color: '#8b92b0', callback: (v) => 'RM ' + (v / 1000000).toFixed(1) + 'M' } }
+                        }
+                    }
+                });
+
+                console.log('[BU] ✅ Chart created');
+            } catch (error) {
+                console.error('[BU] ❌ Error:', error);
+            }
+        }
+
+        async function loadUnitChart() {
+            try {
+                console.log('[UNIT] Loading chart...');
+
+                const response = await fetch(`${API_URL}/quantity/analysis`);
+                if (!response.ok) throw new Error('Failed to load unit data');
+                const data = await response.json();
+
+                console.log('[UNIT] Received:', data.length, 'units');
+
+                // Store ALL data for View Details
+                allUnitData = data;
+
+                // Sort and take TOP 5 ONLY
+                const sortedData = [...data].sort((a, b) => (b.total_quantity || 0) - (a.total_quantity || 0));
+                const top5 = sortedData.slice(0, 5);
+
+                console.log('[UNIT] Displaying top 5:', top5.map(d => d.unit));
+
+                const ctx = document.getElementById('unitChart');
+                if (charts.unitChart) charts.unitChart.destroy();
+
+                charts.unitChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: top5.map(d => d.unit),
+                        datasets: [{
+                            label: 'Total Quantity',
+                            data: top5.map(d => d.total_quantity),
+                            backgroundColor: 'rgba(247,147,30,0.3)',
+                            borderColor: '#f7931e',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#f7931e',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#242936', titleColor: '#fff', bodyColor: '#fff', borderColor: '#f7931e', borderWidth: 2 }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#8b92b0', font: { weight: 600 } } },
+                            y: { grid: { color: '#2d3142' }, ticks: { color: '#8b92b0', font: { weight: 600 } } }
+                        }
+                    }
+                });
+
+                console.log('[UNIT] ✅ Chart created');
+            } catch (error) {
+                console.error('[UNIT] ❌ Error:', error);
+            }
+        }
+
+        // View Details Functions
+        async function viewAllProgress() {
+            console.log('[MODAL] Opening progress with', allProgressData.length, 'projects');
+
+            if (!allProgressData || allProgressData.length === 0) {
+                alert('No project data available');
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table><thead><tr><th>Rank</th><th>Project</th><th>BU</th><th>Status</th><th>Progress</th><th>Value (RM)</th><th>Completed (RM)</th><th>Contractor</th></tr></thead><tbody>';
+
+            // Sort by value for modal
+            const sorted = [...allProgressData].sort((a, b) => (b.value_rm || 0) - (a.value_rm || 0));
+
+            sorted.forEach((p, index) => {
+                const statusClass = (p.status || '').toLowerCase().replace(/[\s-]/g, '');
+                // FIX: Use 'award' field instead of 'contractor'
+                const contractor = p.award || p.contractor || 'Unknown';
+                html += `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td style="font-weight: 600;">${p.project}</td>
+                <td>${p.bu}</td>
+                <td><span class="status-badge ${statusClass}">${p.status}</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${p.progress_percent || p.percentage || 0}%"></div>
+                        </div>
+                        <span>${(p.progress_percent || p.percentage || 0).toFixed(0)}%</span>
+                    </div>
+                </td>
+                <td>RM ${formatNumber(p.value_rm || 0)}</td>
+                <td>RM ${formatNumber(p.value_completed || 0)}</td>
+                <td>${contractor}</td>
+            </tr>
+        `;
+            });
+
+            html += '</tbody></table></div>';
+            openModal('All Projects - Complete List (' + sorted.length + ' projects)', html);
+        }
+
+        async function viewAllContractors() {
+            console.log('[MODAL] Opening contractors with', Object.keys(allContractorData).length, 'contractors');
+
+            if (!allContractorData || Object.keys(allContractorData).length === 0) {
+                alert('No contractor data available');
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table><thead><tr><th>Rank</th><th>Contractor</th><th>Total Value (RM)</th></tr></thead><tbody>';
+
+            const sorted = Object.entries(allContractorData).sort((a, b) => b[1] - a[1]);
+            sorted.forEach(([contractor, value], index) => {
+                html += `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td style="font-weight: 600;">${contractor}</td>
+                <td>RM ${formatNumber(value)}</td>
+            </tr>
+        `;
+            });
+
+            html += '</tbody></table></div>';
+            openModal('All Contractors - Complete List (' + sorted.length + ' contractors)', html);
+        }
+
+        async function viewAllBU() {
+            console.log('[MODAL] Opening BU with', allBUData.length, 'business units');
+
+            if (!allBUData || allBUData.length === 0) {
+                alert('No BU data available');
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table><thead><tr><th>Rank</th><th>Business Unit</th><th>Total Value (RM)</th><th>Completed (RM)</th><th>Projects</th><th>Avg Completion</th></tr></thead><tbody>';
+
+            allBUData.forEach((bu, index) => {
+                html += `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td style="font-weight: 600;">${bu.bu}</td>
+                <td>RM ${formatNumber(bu.total_value || 0)}</td>
+                <td>RM ${formatNumber(bu.total_completed_value || bu.completed_value || 0)}</td>
+                <td>${bu.project_count || 0}</td>
+                <td>${(bu.average_completion || 0).toFixed(1)}%</td>
+            </tr>
+        `;
+            });
+
+            html += '</tbody></table></div>';
+            openModal('All Business Units - Complete Analysis (' + allBUData.length + ' units)', html);
+        }
+
+        async function viewAllUnits() {
+            console.log('[MODAL] Opening units with', allUnitData.length, 'units');
+
+            if (!allUnitData || allUnitData.length === 0) {
+                alert('No unit data available');
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table><thead><tr><th>Rank</th><th>Unit</th><th>Total Quantity</th><th>Projects</th></tr></thead><tbody>';
+
+            allUnitData.forEach((unit, index) => {
+                html += `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td style="font-weight: 600;">${unit.unit}</td>
+                <td>${formatNumber(unit.total_quantity || 0)}</td>
+                <td>${unit.project_count || 0}</td>
+            </tr>
+        `;
+            });
+
+            html += '</tbody></table></div>';
+            openModal('All Units - Complete Analysis (' + allUnitData.length + ' units)', html);
+        }
+
+        // Modal Functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        async function loadCostAnalysis() {
+            try {
+                console.log('[COST] Loading...');
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const summaryResponse = await fetch(`${API_URL}/dashboard/summary?${params}`);
+                const summary = await summaryResponse.json();
+
+                const remaining = (summary.total_value_rm || 0) - (summary.total_completed_value || 0);
+                const utilization = summary.total_value_rm > 0 ? ((summary.total_completed_value / summary.total_value_rm) * 100).toFixed(1) : 0;
+
+                document.getElementById('cost-kpis').innerHTML = `
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total Budget</span>
+                    <div class="kpi-icon orange"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="kpi-value">RM ${(summary.total_value_rm / 1000000).toFixed(1)}M</div>
+                <div class="kpi-subtitle">Total allocated budget</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Spent</span>
+                    <div class="kpi-icon green"><i class="fas fa-money-bill-wave"></i></div>
+                </div>
+                <div class="kpi-value">RM ${(summary.total_completed_value / 1000000).toFixed(1)}M</div>
+                <div class="kpi-subtitle">Total amount spent</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Remaining</span>
+                    <div class="kpi-icon blue"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="kpi-value">RM ${(remaining / 1000000).toFixed(1)}M</div>
+                <div class="kpi-subtitle">Budget remaining</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Utilization</span>
+                    <div class="kpi-icon yellow"><i class="fas fa-percentage"></i></div>
+                </div>
+                <div class="kpi-value">${utilization}%</div>
+                <div class="kpi-subtitle">Budget utilization rate</div>
+            </div>
+        `;
+
+                await loadCostChart();
+                await loadValueCompletedChart();
+                console.log('[COST] ✅ Loaded');
+            } catch (error) {
+                console.error('[COST] ❌ Error:', error);
+            }
+        }
+
+        // ENHANCED COST DISTRIBUTION CHART - Horizontal Bar with Gradients and Data Labels
+        async function loadCostChart() {
+            try {
+                console.log('[COST CHART] Loading enhanced horizontal bar chart...');
+                
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/cost/by-contractor?${params}`);
+                const result = await response.json();
+                const data = result.data || result;
+
+                // Sort and take TOP 10 contractors
+                const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 10);
+                const contractors = sorted.map(([k, v]) => k);
+                const values = sorted.map(([k, v]) => v);
+
+                console.log('[COST CHART] Displaying top 10 contractors');
+
+                const ctx = document.getElementById('costChart');
+                if (charts.costChart) charts.costChart.destroy();
+
+                // Create gradient colors for each bar
+                const gradients = contractors.map((_, index) => {
+                    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 500, 0);
+                    const hue = (index * 30) % 360; // Rotate through hues
+                    gradient.addColorStop(0, `hsl(${25 + hue}, 95%, 60%)`);
+                    gradient.addColorStop(1, `hsl(${40 + hue}, 95%, 50%)`);
+                    return gradient;
+                });
+
+                charts.costChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: contractors,
+                        datasets: [{
+                            label: 'Cost (RM)',
+                            data: values,
+                            backgroundColor: [
+                                'linear-gradient(90deg, #ff6b35, #f7931e)',
+                                'linear-gradient(90deg, #f7931e, #ffd23f)',
+                                'linear-gradient(90deg, #ffd23f, #ffaa33)',
+                                'linear-gradient(90deg, #ffaa33, #ff8c42)',
+                                'linear-gradient(90deg, #ff8c42, #ff6b35)',
+                                'linear-gradient(90deg, #28a745, #20c997)',
+                                'linear-gradient(90deg, #17a2b8, #138496)',
+                                'linear-gradient(90deg, #007bff, #0056b3)',
+                                'linear-gradient(90deg, #6610f2, #5a0cc9)',
+                                'linear-gradient(90deg, #e83e8c, #d63384)'
+                            ].map((gradient, i) => {
+                                const ctx2d = ctx.getContext('2d');
+                                const g = ctx2d.createLinearGradient(0, 0, 1000, 0);
+                                const colors = gradient.match(/#[a-f0-9]{6}/gi);
+                                if (colors && colors.length >= 2) {
+                                    g.addColorStop(0, colors[0]);
+                                    g.addColorStop(1, colors[1]);
+                                }
+                                return g;
+                            }),
+                            borderRadius: 8,
+                            borderWidth: 2,
+                            borderColor: 'rgba(255, 107, 53, 0.3)',
+                            barThickness: 30
+                        }]
+                    },
+                    plugins: [ChartDataLabels],
+                    options: {
+                        indexAxis: 'y', // HORIZONTAL BARS
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { 
+                                backgroundColor: '#242936',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#ff6b35',
+                                borderWidth: 2,
+                                padding: 12,
+                                callbacks: { 
+                                    label: (ctx) => 'RM ' + formatNumber(ctx.parsed.x)
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 11
+                                },
+                                formatter: (value) => 'RM ' + (value / 1000000).toFixed(1) + 'M',
+                                anchor: 'end',
+                                align: 'start',
+                                offset: -10
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                grid: { color: '#2d3142', drawBorder: false },
+                                ticks: { 
+                                    color: '#8b92b0',
+                                    font: { weight: 600 },
+                                    callback: (v) => 'RM ' + (v / 1000000).toFixed(0) + 'M'
+                                }
+                            },
+                            y: { 
+                                grid: { display: false },
+                                ticks: { 
+                                    color: '#8b92b0',
+                                    font: { weight: 600, size: 12 }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                console.log('[COST CHART] ✅ Enhanced chart created');
+            } catch (error) {
+                console.error('[COST CHART] ❌ Error:', error);
+            }
+        }
+
+        async function loadValueCompletedChart() {
+            try {
+                const response = await fetch(`${API_URL}/business-units/analysis`);
+                const data = await response.json();
+
+                const ctx = document.getElementById('valueCompletedChart');
+                if (charts.valueCompletedChart) charts.valueCompletedChart.destroy();
+
+                charts.valueCompletedChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.bu),
+                        datasets: [{
+                            label: 'Total Value',
+                            data: data.map(d => d.total_value || 0),
+                            borderColor: '#ff6b35',
+                            backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Completed Value',
+                            data: data.map(d => d.total_completed_value || d.completed_value || 0),
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#8b92b0' } },
+                            tooltip: { backgroundColor: '#242936' }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#8b92b0' } },
+                            y: { grid: { color: '#2d3142' }, ticks: { color: '#8b92b0', callback: (v) => 'RM ' + (v / 1000000).toFixed(1) + 'M' } }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('[VALUE CHART] ❌ Error:', error);
+            }
+        }
+
+        async function loadTimeline() {
+            try {
+                console.log('[TIMELINE] Loading...');
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/cds/timeline?${params}`);
+                if (!response.ok) throw new Error('Failed');
+                const timeline = await response.json();
+                const tbody = document.getElementById('timeline-tbody');
+
+                if (timeline.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No timeline data found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = timeline.map(t => {
+                    const statusClass = (t.status || '').toLowerCase().replace(/[\s-]/g, '');
+                    // FIX: Use 'award' field instead of 'contractor'
+                    const contractor = t.award || t.contractor || 'N/A';
+                    return `
+            <tr>
+                <td style="font-weight: 600;">${t.project}</td>
+                <td>${t.cds || 'N/A'}</td>
+                <td>${contractor}</td>
+                <td>${t.estimated_days || 'N/A'}</td>
+                <td>${t.planned_finish_date || t.finish_date || 'N/A'}</td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${t.completion_percent || 0}%"></div>
+                        </div>
+                        <span>${(t.completion_percent || 0).toFixed(0)}%</span>
+                    </div>
+                </td>
+            </tr>
+        `}).join('');
+                console.log('[TIMELINE] ✅ Loaded');
+            } catch (error) {
+                console.error('[TIMELINE] ❌ Error:', error);
+                showError('timeline-tbody');
+            }
+        }
+
+        async function loadLocations() {
+            try {
+                console.log('[LOCATIONS] Loading...');
+                const params = new URLSearchParams(Object.entries(currentFilters).filter(([k, v]) => v !== 'all'));
+                const response = await fetch(`${API_URL}/locations/analysis?${params}`);
+                if (!response.ok) throw new Error('Failed');
+                const locations = await response.json();
+                const content = document.getElementById('locations-content');
+
+                if (locations.length === 0) {
+                    content.innerHTML = '<div class="loading">No location data found</div>';
+                    return;
+                }
+
+                content.innerHTML = locations.map(loc => `
+            <div class="location-card">
+                <div class="location-header">
+                    <div class="location-info">
+                        <h3><i class="fas fa-map-pin"></i> ${loc.location}</h3>
+                        <p>${loc.bu}</p>
+                    </div>
+                    <div class="location-badge">${loc.project_count}</div>
+                </div>
+                <div class="location-details">
+                    <div class="location-detail-item">
+                        <div class="location-detail-label">Total Value:</div>
+                        <div class="location-detail-value">RM ${formatNumber(loc.total_value || 0)}</div>
+                    </div>
+                    <div class="location-detail-item">
+                        <div class="location-detail-label">Average Completion:</div>
+                        <div class="location-progress-bar">
+                            <div class="location-progress-fill" style="width: ${loc.average_completion || 0}%"></div>
+                        </div>
+                        <div class="location-detail-value" style="margin-top: 8px; color: var(--primary-color);">${(loc.average_completion || 0).toFixed(0)}%</div>
+                    </div>
+                    <div class="location-detail-item">
+                        <div class="location-detail-label">Contractors:</div>
+                        <div class="location-contractors">${(loc.contractors || []).slice(0, 3).join(', ')}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+                console.log('[LOCATIONS] ✅ Loaded');
+            } catch (error) {
+                console.error('[LOCATIONS] ❌ Error:', error);
+                showError('locations-content');
+            }
+        }
+
+        async function loadStaff() {
+            try {
+                console.log('[STAFF] Loading...');
+                const response = await fetch(`${API_URL}/staff/workload`);
+                if (!response.ok) throw new Error('Failed');
+                const staff = await response.json();
+                const tbody = document.getElementById('staff-tbody');
+
+                if (staff.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No staff data found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = staff.map(s => `
+            <tr>
+                <td style="font-weight: 600;">${s.staff_name}</td>
+                <td>RM ${formatNumber(s.total_value_supervised || 0)}</td>
+                <td>${s.projects_under_supervision || 0}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${s.average_completion || 0}%"></div>
+                        </div>
+                        <span>${(s.average_completion || 0).toFixed(0)}%</span>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+                console.log('[STAFF] ✅ Loaded');
+            } catch (error) {
+                console.error('[STAFF] ❌ Error:', error);
+                showError('staff-tbody');
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                console.log('[SETTINGS] Loading...');
+                const filtersResponse = await fetch(`${API_URL}/filters/options`);
+                const filters = await filtersResponse.json();
+
+                document.getElementById('settings-total-projects').textContent = filters.projects ? filters.projects.length : 0;
+                document.getElementById('settings-bus').textContent = filters.bus ? filters.bus.join(', ') : '-';
+                document.getElementById('settings-contractors').textContent = filters.contractors ? filters.contractors.length : 0;
+                document.getElementById('settings-locations').textContent = filters.locations ? filters.locations.length : 0;
+                console.log('[SETTINGS] ✅ Loaded');
+            } catch (error) {
+                console.error('[SETTINGS] ❌ Error:', error);
+            }
+        }
+
+        async function reloadExcelData() {
+            try {
+                console.log('[RELOAD] Reloading Excel data...');
+                const response = await fetch(`${API_URL}/data/reload`, { method: 'POST' });
+                const result = await response.json();
+                alert(`Data reloaded! ${result.projects_loaded} projects loaded.`);
+                await loadFilters();
+                await refreshCurrentSection();
+                console.log('[RELOAD] ✅ Data reloaded');
+            } catch (error) {
+                console.error('[RELOAD] ❌ Error:', error);
+                alert('Failed to reload data.');
+            }
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(Math.round(num || 0));
+        }
+
+        function showError(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Failed to load data</div>';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[INIT] 🚀 Dashboard starting...');
+            await loadFilters();
+            await loadDashboard();
+            console.log('[INIT] ✅ Dashboard loaded successfully');
+        });
+    </script>
+</body>
+
+</html>
