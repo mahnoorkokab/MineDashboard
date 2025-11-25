@@ -307,8 +307,21 @@ app.add_middleware(
 async def serve_frontend():
     """Serve the frontend dashboard"""
     try:
-        with open("index.html", "r", encoding="utf-8") as f:
-            return f.read()
+        # Try multiple possible paths for index.html
+        possible_paths = [
+            "index.html",
+            os.path.join(os.path.dirname(__file__), "index.html"),
+            os.path.join(Path(__file__).parent, "index.html"),
+            os.path.join(os.getcwd(), "index.html"),
+        ]
+        
+        for html_path in possible_paths:
+            if os.path.exists(html_path):
+                with open(html_path, "r", encoding="utf-8") as f:
+                    return f.read()
+        
+        # If not found, return error
+        raise FileNotFoundError("index.html not found in any expected location")
     except FileNotFoundError:
         return HTMLResponse(
             content="""

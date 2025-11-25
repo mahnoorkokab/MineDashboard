@@ -11,24 +11,17 @@ from pathlib import Path
 parent_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(parent_dir))
 
+# Change to parent directory so file paths work correctly
+os.chdir(parent_dir)
+
 # Import the FastAPI app
 from app import app
 
 # Use Mangum to convert FastAPI (ASGI) to AWS Lambda/Vercel format
-try:
-    from mangum import Mangum
-    handler = Mangum(app, lifespan="off")
-except ImportError:
-    # Fallback if mangum is not available
-    def handler(event, context):
-        return {
-            "statusCode": 500,
-            "body": "Mangum is required. Install with: pip install mangum"
-        }
+from mangum import Mangum
 
-def lambda_handler(event, context):
-    """
-    Vercel serverless function entry point
-    This function is called by Vercel for all API requests
-    """
-    return handler(event, context)
+# Create the handler - this is what Vercel will call
+handler = Mangum(app, lifespan="off")
+
+# Export the handler for Vercel
+__all__ = ["handler"]
