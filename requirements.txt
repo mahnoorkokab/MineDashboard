@@ -5,3 +5,4 @@ openpyxl==3.1.5
 pydantic==2.10.4
 python-multipart==0.0.20
 mangum==0.18.0
+numpy 

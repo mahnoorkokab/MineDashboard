@@ -855,7 +855,7 @@
 
         async function downloadTemplate() {
             try {
-                const response = await fetch('/download-template');
+                const response = await fetch('/api/download-template');
                 
                 // ✅ FIX: Check if response is successful before downloading
                 if (!response.ok) {
@@ -892,7 +892,7 @@
             formData.append('file', selectedFile);
 
             try {
-                const response = await fetch('/upload', {
+                const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 });
