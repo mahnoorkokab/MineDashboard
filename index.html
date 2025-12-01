@@ -135,12 +135,15 @@
         }
 
         .page-title h2 {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;              /* Standard property */
+    -webkit-background-clip: text;      /* Chrome, Safari */
+    color: transparent;                 /* Standard */
+    -webkit-text-fill-color: transparent; /* Safari, Chrome */
+   }
+
 
         .page-title p {
             color: var(--text-secondary);
@@ -890,7 +893,7 @@
                         <option value="all">All Contractors</option>
                     </select>
                 </div>
-                <button class="action-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="action-btn" onclick="window.location.href='upload.html'">UploadFile</button>
             </div>
         </div>
 

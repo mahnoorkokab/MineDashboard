@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, date
 from pydantic import BaseModel, Field, field_validator
-
+from fastapi.responses import FileResponse
 from enum import Enum
 import pandas as pd
 from collections import defaultdict
@@ -303,6 +303,22 @@ app.add_middleware(
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Serve the frontend HTML file at root
+@app.get("/upload.html")
+async def serve_upload():
+    return FileResponse("upload.html")
+@app.get("/download-template")
+async def download_template():
+    """Download Excel template file"""
+    template_path = "C:\\Users\\Administrator\\Desktop\\new dashboard\\DASHBOARD\\template .xlsx"  # Your template file name
+    
+    if not os.path.exists(template_path):
+        raise HTTPException(status_code=404, detail="Template file not found")
+    
+    return FileResponse(
+        path=template_path,
+        filename="template.xlsx",
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 @app.get("/", response_class=HTMLResponse, tags=["Root"], include_in_schema=False)
 async def serve_frontend():
     """Serve the frontend dashboard"""
