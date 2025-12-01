@@ -354,7 +354,15 @@ BASE_DIR = Path(__file__).parent.parent
 
 # Your file name is "template .xlsx" (with a space before .xlsx)
 # If possible, rename it to "template.xlsx" in the folder and in git.
-TEMPLATE_PATH = BASE_DIR / "template.xlsx"   # after renaming the file
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from pathlib import Path
+
+app = FastAPI()
+
+# app.py is in DASHBOARD/api/app.py → parent.parent == repo/DASHBOARD
+BASE_DIR = Path(__file__).parent.parent
+TEMPLATE_PATH = BASE_DIR / "template .xlsx"  # file must be DASHBOARD/template.xlsx
 
 @app.get("/download-template")
 def download_template():
@@ -366,8 +374,9 @@ def download_template():
     return FileResponse(
         TEMPLATE_PATH,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="BuildPro_Construction_Template.xlsx",
+        filename="template .xlsx",
     )
+
 
 
 def load_excel_data(file_path: str) -> List[Dict]:
