@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Management Project Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff6b35;
+            --secondary-color: #f7931e;
+            --accent-color: #ffd23f;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-bg: #1a1d29;
+            --card-bg: #242936;
+            --text-primary: #ffffff;
+            --text-secondary: #8b92b0;
+            --border-color: #2d3142;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--card-bg);
+            padding: 25px 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 13px 26px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 22px;
+        }
+
+        .upload-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .info-icon {
+            background: linear-gradient(135deg, var(--info-color), #138496);
+            color: white;
+        }
+
+        .card h2 {
+            font-size: 24px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 26px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .download-template-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 11px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .download-template-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.5);
+        }
+
+        .template-note {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 12px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 9px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 55px 25px;
+            text-align: center;
+            background: rgba(255, 107, 53, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 22px;
+            margin-top: 22px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(255, 107, 53, 0.15);
+            border-style: solid;
+        }
+
+        .upload-icon-large {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 22px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .upload-area h3 {
+            font-size: 19px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .upload-area p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, var(--info-color), #138496);
+            color: white;
+            border: none;
+            padding: 13px 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(23, 162, 184, 0.4);
+        }
+
+        .supported-formats {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        .file-info {
+            background: rgba(40, 167, 69, 0.1);
+            border: 2px solid var(--success-color);
+            border-radius: 12px;
+            padding: 17px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .file-info.show {
+            display: flex;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .file-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .remove-file {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .remove-file:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .upload-submit-btn {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 11px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            display: none;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .upload-submit-btn.show {
+            display: flex;
+        }
+
+        .upload-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.5);
+        }
+
+        .upload-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .format-requirements {
+            margin-top: 32px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .format-requirements::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .format-requirements::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .format-requirements::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .format-requirements h3 {
+            font-size: 19px;
+            color: var(--text-primary);
+            margin-bottom: 22px;
+            font-weight: 600;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255, 107, 53, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        .requirement-item:hover {
+            background: rgba(255, 107, 53, 0.1);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .requirement-number {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .requirement-text {
+            flex: 1;
+        }
+
+        .requirement-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 13px;
+        }
+
+        .requirement-desc {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 3px;
+            line-height: 1.5;
+        }
+
+        .important-box {
+            background: rgba(23, 162, 184, 0.1);
+            border-left: 4px solid var(--info-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .important-box h4 {
+            color: var(--info-color);
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .important-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .important-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .arrow {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .validation-result {
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .validation-result.show {
+            display: block;
+        }
+
+        .validation-success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 2px solid var(--success-color);
+            color: var(--text-primary);
+        }
+
+        .validation-error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid var(--danger-color);
+            color: var(--text-primary);
+        }
+
+        .validation-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 17px;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .validation-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .success-icon {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .error-icon {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .error-list {
+            margin-top: 17px;
+        }
+
+        .error-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 17px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .error-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--danger-color);
+            font-size: 15px;
+        }
+
+        .error-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-left: 17px;
+            line-height: 1.6;
+        }
+
+        .error-details li {
+            margin-bottom: 6px;
+        }
+
+        .found-headers, .expected-headers {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 17px;
+            height: 17px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">🏗️</div>
+                <div class="header-title">
+                    <h1>Construction Management Project</h1>
+                    <p>File Upload & Format Validation System</p>
+                </div>
+            </div>
+            <button class="back-btn" onclick="window.history.back()">
+                <span>←</span> Back to Dashboard
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column: Upload Section -->
+            <div class="card">
+                <div class="card-icon upload-icon">📤</div>
+                <h2>Upload Project Excel File</h2>
+                <p>Select or drag & drop your Excel file (.xlsx, .xls) or CSV file containing construction project data</p>
+
+                <!-- Download Template Button -->
+                <button class="download-template-btn" onclick="downloadTemplate()">
+                    <span>⬇</span> Download Format Template
+                </button>
+                <div class="template-note">
+                    📋 Download a sample Excel file with the correct construction project format
+                </div>
+
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon-large">📁</div>
+                    <h3>Drop your project file here</h3>
+                    <p>or</p>
+                    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                        <span>📂</span> Browse Files
+                    </button>
+                    <div class="supported-formats">Supported formats: .xlsx, .xls, .csv</div>
+                </div>
+
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+
+                <!-- File Info -->
+                <div class="file-info" id="fileInfo">
+                    <div class="file-details">
+                        <div class="file-icon">📄</div>
+                        <div>
+                            <div class="file-name" id="fileName">filename.xlsx</div>
+                            <div class="file-size" id="fileSize">0 KB</div>
+                        </div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile()">✕</button>
+                </div>
+
+                <!-- Upload Button -->
+                <button class="upload-submit-btn" id="uploadBtn" onclick="uploadFile()">
+                    <span>⬆</span> Upload & Validate File
+                </button>
+
+                <!-- Validation Result -->
+                <div class="validation-result" id="validationResult"></div>
+            </div>
+
+            <!-- Right Column: Format Requirements -->
+            <div class="card">
+                <div class="card-icon info-icon">ℹ️</div>
+                <h2>Format Requirements</h2>
+                <p>Your Excel file must contain exactly <strong>24 columns</strong> for construction project data in this exact order:</p>
+
+                <div class="format-requirements">
+                    <div class="requirement-item">
+                        <div class="requirement-number">1</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">Project</div>
+                            <div class="requirement-desc">Project name (Required text)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">2</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">BU</div>
+                            <div class="requirement-desc">Business unit code (Required)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">3</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">Location</div>
+                            <div class="requirement-desc">Project location (Required)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">4</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">Status</div>
+                            <div class="requirement-desc">Project status (Required)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">5</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">%</div>
+                            <div class="requirement-desc">Completion % (0-100, no negatives)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">6</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">Value (RM)ss</div>
+                            <div class="requirement-desc">Value in RM (Numeric, no negatives)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">7</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">VO/RM ⭐</div>
+                            <div class="requirement-desc">Variation order (Auto-fills 0 if empty)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">8</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">CDS</div>
+                            <div class="requirement-desc">Contract date (Date format)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">9</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">SPP ⭐</div>
+                            <div class="requirement-desc">Special parameter (Auto-fills 0 if empty)</div>
+                        </div>
+                    </div>
+
+                    <div class="requirement-item">
+                        <div class="requirement-number">10-24</div>
+                        <div class="requirement-text">
+                            <div class="requirement-label">Additional Fields</div>
+                            <div class="requirement-desc">Unit, Quantity, Award, Staff, Worksite, Remark, Date - All required</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Box -->
+                <div class="important-box">
+                    <h4>⚠️ Critical Validation Rules:</h4>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>All fields must be filled</strong> - No blank cells (except VO/RM & SPP)</span>
+                    </div>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>No negative values</strong> - All numbers must be ≥ 0</span>
+                    </div>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>Valid data types</strong> - Numbers in numeric fields, dates in date fields</span>
+                    </div>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>VO/RM & SPP auto-fill</strong> - Set to 0 if left empty</span>
+                    </div>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>Headers in row 1</strong> - Exact match required</span>
+                    </div>
+                    <div class="important-item">
+                        <span class="arrow">→</span>
+                        <span><strong>Exactly 24 columns</strong> - No more, no less</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const validTypes = ['.xlsx', '.xls', '.csv'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!validTypes.includes(fileExtension)) {
+                showValidationError({
+                    success: false,
+                    message: 'Invalid file format',
+                    errors: [{
+                        type: 'file_type',
+                        message: 'Please upload an Excel file (.xlsx, .xls) or CSV file'
+                    }]
+                });
+                return;
+            }
+
+            selectedFile = file;
+
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileInfo').classList.add('show');
+            document.getElementById('uploadBtn').classList.add('show');
+            document.getElementById('validationResult').classList.remove('show');
+        }
+
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.remove('show');
+            document.getElementById('uploadBtn').classList.remove('show');
+            document.getElementById('validationResult').classList.remove('show');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        async function downloadTemplate() {
+            try {
+                const response = await fetch('/download-template');
+                
+                // ✅ FIX: Check if response is successful before downloading
+                if (!response.ok) {
+                    throw new Error('Template file not found on server. Please contact administrator.');
+                }
+                
+                // Only download if response is OK (not 404 or other errors)
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'BuildPro_Construction_Template.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                alert('❌ Error downloading template: ' + error.message + '\n\nPlease ensure the template file exists on the server.');
+            }
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) {
+                alert('Please select a file first');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const originalText = uploadBtn.innerHTML;
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<span class="loading"></span> Validating...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showValidationSuccess(result);
+                } else {
+                    showValidationError(result);
+                }
+            } catch (error) {
+                showValidationError({
+                    success: false,
+                    message: 'Upload failed',
+                    errors: [{
+                        type: 'network_error',
+                        message: error.message
+                    }]
+                });
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = originalText;
+            }
+        }
+
+        function showValidationSuccess(result) {
+            const validationResult = document.getElementById('validationResult');
+            validationResult.className = 'validation-result validation-success show';
+            
+            validationResult.innerHTML = `
+                <div class="validation-header">
+                    <div class="validation-icon success-icon">✓</div>
+                    <div>Construction Project Data Validated ✅</div>
+                </div>
+                <div style="font-size: 15px; line-height: 1.6;">
+                    <strong>${result.message}</strong><br>
+                    <span style="color: var(--text-secondary); font-size: 14px;">
+                        📊 Projects processed: <strong style="color: var(--success-color);">${result.data.rows_processed}</strong><br>
+                        ✅ All validation rules passed successfully
+                    </span>
+                </div>
+            `;
+        }
+
+        function showValidationError(result) {
+            const validationResult = document.getElementById('validationResult');
+            validationResult.className = 'validation-result validation-error show';
+            
+            let errorsHtml = '';
+            
+            if (result.errors && result.errors.length > 0) {
+                result.errors.forEach(error => {
+                    let errorContent = `<div class="error-item">
+                        <div class="error-title">`;
+                    
+                    if (error.type === 'header_mismatch') {
+                        errorContent += `❌ ${error.message}</div>`;
+                        
+                        if (error.found) {
+                            errorContent += `<div class="found-headers">
+                                <strong>📋 Found Headers:</strong><br>
+                                ${error.found.join(', ')}
+                            </div>`;
+                        }
+                        
+                        if (error.expected) {
+                            errorContent += `<div class="expected-headers">
+                                <strong>✅ Expected Headers:</strong><br>
+                                ${error.expected.join(', ')}
+                            </div>`;
+                        }
+                    } else if (error.type === 'column_count') {
+                        errorContent += `❌ ${error.message}</div>`;
+                        if (error.details) {
+                            errorContent += `<div class="error-details">${error.details}</div>`;
+                        }
+                    } else if (error.type === 'row_validation') {
+                        errorContent += `❌ ${error.message}</div>`;
+                        if (error.details && error.details.length > 0) {
+                            errorContent += `<ul class="error-details">`;
+                            error.details.forEach(detail => {
+                                errorContent += `<li>🔸 ${detail}</li>`;
+                            });
+                            errorContent += `</ul>`;
+                        }
+                    } else {
+                        errorContent += `❌ ${error.message}</div>`;
+                    }
+                    
+                    errorContent += `</div>`;
+                    errorsHtml += errorContent;
+                });
+            }
+            
+            validationResult.innerHTML = `
+                <div class="validation-header">
+                    <div class="validation-icon error-icon">✕</div>
+                    <div>Validation Failed ❌</div>
+                </div>
+                <div style="margin-top: 12px; font-size: 14px; margin-bottom: 17px; line-height: 1.6;">
+                    ${result.message || 'Please fix the errors below and try uploading again.'}
+                </div>
+                <div class="error-list">
+                    ${errorsHtml}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
