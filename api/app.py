@@ -346,25 +346,43 @@ async def serve_frontend():
 
 @app.get("/upload.html")
 async def serve_upload():
-    return FileResponse("upload.html")
+    """Serve upload.html page"""
+    try:
+        # Try multiple possible paths for upload.html
+        possible_paths = [
+            "upload.html",
+            os.path.join(os.path.dirname(__file__), "..", "upload.html"),
+            os.path.join(Path(__file__).parent.parent, "upload.html"),
+            os.path.join(os.getcwd(), "upload.html"),
+        ]
+        
+        for html_path in possible_paths:
+            if os.path.exists(html_path):
+                return FileResponse(html_path)
+        
+        # If not found, return error
+        raise FileNotFoundError("upload.html not found in any expected location")
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="""
+            <html>
+                <head><title>Upload Page Not Found</title></head>
+                <body>
+                    <h1>Upload Page Not Found</h1>
+                    <p>upload.html file not found. Please ensure it exists in the project directory.</p>
+                    <p><a href="/">Back to Dashboard</a> | <a href="/docs">API Documentation</a></p>
+                </body>
+            </html>
+            """,
+            status_code=404
+        )
 
-# app.py is in DASHBOARD/api/app.py
-# So parent.parent == DASHBOARD
-BASE_DIR = Path(__file__).parent.parent
-
-# Your file name is "template .xlsx" (with a space before .xlsx)
-# If possible, rename it to "template.xlsx" in the folder and in git.
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from pathlib import Path
-
-app = FastAPI()
 
 # app.py is in DASHBOARD/api/app.py → parent.parent == repo/DASHBOARD
 BASE_DIR = Path(__file__).parent.parent
-TEMPLATE_PATH = BASE_DIR / "template .xlsx"  # file must be DASHBOARD/template.xlsx
+TEMPLATE_PATH = BASE_DIR / "template.xlsx"  # file must be DASHBOARD/template.xlsx
 
-@app.get("/download-template")
+@app.get("/api/v1/download-template")
 def download_template():
     if not TEMPLATE_PATH.exists():
         raise HTTPException(
@@ -374,7 +392,7 @@ def download_template():
     return FileResponse(
         TEMPLATE_PATH,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="template .xlsx",
+        filename="template.xlsx",
     )
 
 

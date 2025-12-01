@@ -855,7 +855,7 @@
 
         async function downloadTemplate() {
             try {
-                const response = await fetch('/api/download-template');
+                const response = await fetch('/api/v1/download-template');
                 
                 // ✅ FIX: Check if response is successful before downloading
                 if (!response.ok) {
