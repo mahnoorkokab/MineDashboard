@@ -15,7 +15,7 @@ sys.path.insert(0, str(parent_dir))
 os.chdir(parent_dir)
 
 # ✅ CORRECT IMPORT - app.py is in the same directory as index.py
-from app import app
+from DASHBOARD.api.app import app
 
 # Use Mangum to convert FastAPI (ASGI) to AWS Lambda/Vercel format
 from mangum import Mangum

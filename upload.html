@@ -892,7 +892,7 @@
             formData.append('file', selectedFile);
 
             try {
-                const response = await fetch('/api/upload', {
+                const response = await fetch('/api/v1/data/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -931,7 +931,7 @@
                 <div style="font-size: 15px; line-height: 1.6;">
                     <strong>${result.message}</strong><br>
                     <span style="color: var(--text-secondary); font-size: 14px;">
-                        📊 Projects processed: <strong style="color: var(--success-color);">${result.data.rows_processed}</strong><br>
+                        📊 Projects processed: <strong style="color: var(--success-color);">${result.projects_loaded}</strong><br>
                         ✅ All validation rules passed successfully
                     </span>
                 </div>

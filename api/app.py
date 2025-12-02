@@ -20,9 +20,8 @@ import os
 import logging
 from pathlib import Path
 import logging
-from fastapi import APIRouter, UploadFile, File, HTTPException
-import logging
-from typing import List, Dict, Any
+logger = logging.getLogger("app")
+
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
@@ -347,81 +346,38 @@ async def serve_frontend():
 # ============================================================================
 
 
-
-
-logger = logging.getLogger("app")  # make sure logging.basicConfig(...) is configured
-
-router = APIRouter()
-
-@router.post("/api/upload")
-async def upload_file(file: UploadFile = File(...)):
+@app.get("/upload.html")
+async def serve_upload():
+    """Serve upload.html page"""
     try:
-        # 1) Read and validate file (your existing logic)
-        # ------------------------------------------------
-        # Example structure – replace with your real calls:
-        # df = load_excel_to_dataframe(file)
-        # validation_result = validate_projects(df)
-
-        # EXPECTED SHAPE of validation_result:
-        # {
-        #   "success": bool,
-        #   "message": str,
-        #   "errors": [
-        #       {
-        #         "type": "header_mismatch" | "column_count" | "row_validation" | ...,
-        #         "message": "...",
-        #         "found": [...],
-        #         "expected": [...],
-        #         "details": [...]
-        #       },
-        #       ...
-        #   ],
-        #   "data": {
-        #       "rows_processed": int,
-        #       ...
-        #   }
-        # }
-
-        validation_result: Dict[str, Any] = run_your_validation_logic(file)
-
-        # 2) LOG EVERYTHING when validation fails
-        # ---------------------------------------
-        if not validation_result.get("success", False):
-            errors: List[Dict[str, Any]] = validation_result.get("errors", [])
-
-            logger.error("🚨 VALIDATION FAILED")
-            logger.error("Message: %s", validation_result.get("message"))
-            logger.error("Rows processed: %s", validation_result.get("data", {}).get("rows_processed"))
-
-            for idx, err in enumerate(errors, start=1):
-                logger.error("Error #%s: type=%s message=%s", idx, err.get("type"), err.get("message"))
-                if err.get("type") == "header_mismatch":
-                    logger.error("  Found headers   : %s", err.get("found"))
-                    logger.error("  Expected headers: %s", err.get("expected"))
-                if err.get("type") == "column_count":
-                    logger.error("  Details: %s", err.get("details"))
-                if err.get("type") == "row_validation":
-                    logger.error("  Row details:")
-                    for d in err.get("details", []):
-                        logger.error("    - %s", d)
-
-            # Optional: log first bad row raw values if you collect them
-            bad_row = validation_result.get("data", {}).get("first_bad_row")
-            if bad_row:
-                logger.error("First bad row raw data: %s", bad_row)
-
-            return JSONResponse(validation_result, status_code=400)
-
-        # 3) On success, also log
-        logger.info("✅ VALIDATION PASSED. Rows: %s",
-                    validation_result.get("data", {}).get("rows_processed"))
-
-        return JSONResponse(validation_result, status_code=200)
-
-    except Exception as e:
-        logger.exception("Unexpected error during upload/validation")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
+        # Try multiple possible paths for upload.html
+        possible_paths = [
+            "upload.html",
+            os.path.join(os.path.dirname(__file__), "..", "upload.html"),
+            os.path.join(Path(__file__).parent.parent, "upload.html"),
+            os.path.join(os.getcwd(), "upload.html"),
+        ]
+        
+        for html_path in possible_paths:
+            if os.path.exists(html_path):
+                return FileResponse(html_path)
+        
+        # If not found, return error
+        raise FileNotFoundError("upload.html not found in any expected location")
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="""
+            <html>
+                <head><title>Upload Page Not Found</title></head>
+                <body>
+                    <h1>Upload Page Not Found</h1>
+                    <p>upload.html file not found. Please ensure it exists in the project directory.</p>
+                    <p><a href="/">Back to Dashboard</a> | <a href="/docs">API Documentation</a></p>
+                </body>
+            </html>
+            """,
+            status_code=404
+        )
 
 
 # app.py is in DASHBOARD/api/app.py → parent.parent == repo/DASHBOARD
