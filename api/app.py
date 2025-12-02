@@ -21,7 +21,8 @@ import logging
 from pathlib import Path
 import logging
 logger = logging.getLogger("app")
-
+from fastapi import UploadFile, File, HTTPException, status
+from io import BytesIO
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
@@ -708,43 +709,43 @@ async def reload_data_from_excel(file_path: Optional[str] = None):
             detail=f"Failed to load data: {str(e)}"
         )
 
+
+
+from io import BytesIO
+
 @app.post("/api/v1/data/upload", tags=["Data Management"])
 async def upload_excel_file(file: UploadFile = File(...)):
-    """Upload and load data from Excel file"""
     global PROJECTS_DATA
-    
-    if not file.filename.endswith(('.xlsx', '.xls')):
+
+    if not file.filename.endswith((".xlsx", ".xls")):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid file type. Please upload Excel file (.xlsx or .xls)"
+            detail="Invalid file type. Please upload Excel file (.xlsx or .xls)",
         )
-    
-    file_path = f"uploaded_{file.filename}"
-    
+
     try:
-        with open(file_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
-        
-        new_data = load_excel_data(file_path)
+        content = await file.read()
+        buffer = BytesIO(content)
+
+        # IMPORTANT: update load_excel_data to accept a file-like object, not a path
+        new_data = load_excel_data(buffer)
+
         PROJECTS_DATA = new_data
-        
+
         logger.info(f"✅ File uploaded and loaded: {len(PROJECTS_DATA)} projects")
-        
+
         return {
             "success": True,
             "message": "File uploaded and data loaded successfully",
             "filename": file.filename,
             "projects_loaded": len(PROJECTS_DATA),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        logger.error(f"Upload failed: {e}")
+        logger.exception("Upload failed")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to process uploaded file: {str(e)}"
+            detail=f"Failed to process uploaded file: {str(e)}",
         )
 
 # ============================================================================
