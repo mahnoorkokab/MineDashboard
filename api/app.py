@@ -380,7 +380,7 @@ async def serve_upload():
 
 # app.py is in DASHBOARD/api/app.py → parent.parent == repo/DASHBOARD
 BASE_DIR = Path(__file__).parent.parent
-TEMPLATE_PATH = BASE_DIR / "template.xlsx"  # file must be DASHBOARD/template.xlsx
+TEMPLATE_PATH = BASE_DIR / "template.xlsx"
 
 @app.get("/api/v1/download-template")
 def download_template():
@@ -392,7 +392,7 @@ def download_template():
     return FileResponse(
         TEMPLATE_PATH,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="template.xlsx",
+        filename="BuildPro_Construction_Template.xlsx",
     )
 
 
